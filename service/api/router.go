@@ -29,9 +29,9 @@ func (s *ResizePhotoService) Router(r *mux.Router) {
 	v1Auth := v1.PathPrefix("").Subrouter()
 
 	v1Auth.HandleFunc("/balance", s.v1.GetUserBalance).Methods("GET")
-	v1Auth.HandleFunc("/up", s.v1.DebitingFunds).Methods("GET")
-	v1Auth.HandleFunc("/down", s.v1.СreditingFunds).Methods("GET")
-	v1Auth.HandleFunc("/trans", s.v1.TransferFunds).Methods("GET")
+	v1Auth.HandleFunc("/up", s.v1.СreditingFunds).Methods("POST")
+	v1Auth.HandleFunc("/down", s.v1.DebitingFunds).Methods("POST")
+	v1Auth.HandleFunc("/trans", s.v1.TransferFunds).Methods("POST")
 
 }
 

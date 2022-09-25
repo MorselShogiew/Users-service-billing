@@ -28,8 +28,7 @@ func NewResizeDBRepo(p provider.Provider, l logger.Logger) ResizeDBRepo {
 
 func (r resizeDB) GetUserBalance(id int) (float64, error) {
 	var data []byte
-
-	query := "select * from public.users where user_id=$1"
+	query := "select * from users where user_id=$1"
 	if err := r.db.QueryRow(query, id).Scan(&data); err != nil {
 		return 0, errs.New(err, errs.ErrDatabaseRequest, true, 500)
 	}
@@ -44,14 +43,14 @@ func (r resizeDB) СreditingFunds(id int, value float64) error {
 
 	query := "INSERT INTO public.users (user_id, balance) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET balance=users.balance+$2;"
 
-	r.db.QueryRow(query, value, id)
+	r.db.QueryRow(query, id, value)
 	return nil
 }
 
 func (r resizeDB) DebitingFunds(id int, value float64) error {
 	var data []byte
 
-	query := "select * from public.users where user_id=$1"
+	query := "select * from users where user_id=$1"
 	if err := r.db.QueryRow(query, id).Scan(&data); err != nil {
 		return errs.New(err, errs.ErrDatabaseRequest, true, 500)
 	}
@@ -65,14 +64,14 @@ func (r resizeDB) DebitingFunds(id int, value float64) error {
 		return errs.New(nil, errs.ErrNotEnoughFunds, true, 500)
 	}
 
-	querySet := "UPDATE public.users SET balance=balance-$1 WHERE user_id=$2;"
+	querySet := "UPDATE users SET balance=balance-$1 WHERE user_id=$2;"
 	r.db.QueryRow(querySet, newBalance, id)
 	return nil
 }
 
 func (r resizeDB) TransferFunds(idFrom int, idTo int, value float64) error {
 	var data1 []byte
-	query := "select * from public.users where user_id=$1"
+	query := "select * from users where user_id=$1"
 	if err := r.db.QueryRow(query, idFrom).Scan(&data1); err != nil {
 		return errs.New(err, errs.ErrDatabaseRequest, true, 500)
 	}
@@ -86,7 +85,7 @@ func (r resizeDB) TransferFunds(idFrom int, idTo int, value float64) error {
 		return errs.New(nil, errs.ErrNotEnoughFunds, true, 500)
 	}
 	var data2 []byte
-	query = "select * from public.users where user_id=$1"
+	query = "select * from users where user_id=$1"
 	if err := r.db.QueryRow(query, idTo).Scan(&data2); err != nil {
 		return errs.New(err, errs.ErrDatabaseRequest, true, 500)
 	}
@@ -99,8 +98,8 @@ func (r resizeDB) TransferFunds(idFrom int, idTo int, value float64) error {
 
 	tx, err := r.db.Begin()
 
-	queryWithdraw := "UPDATE public.users SET balance=$1 WHERE user_id=$2;"
-	queryAdd := "UPDATE public.users SET balance=$1 WHERE user_id=$2;"
+	queryWithdraw := "UPDATE users SET balance=$1 WHERE user_id=$2;"
+	queryAdd := "UPDATE users SET balance=$1 WHERE user_id=$2;"
 
 	if _, err := tx.Exec(queryWithdraw, newBalance1, idFrom); err != nil {
 		return errs.New(err, errs.ErrDatabaseRequest, true, 500)

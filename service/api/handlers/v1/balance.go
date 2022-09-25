@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -43,7 +44,7 @@ func (h *Handlers) DebitingFunds(w http.ResponseWriter, r *http.Request) {
 
 	idStr := r.URL.Query().Get("id")
 	valueStr := r.URL.Query().Get("value")
-
+	fmt.Println("asfqef")
 	if idStr == "" || valueStr == "" {
 		err := errs.New(nil, errs.ErrBadRequest, false, 500)
 		h.CheckErrWriteResp(err, w, reqID)
@@ -72,7 +73,6 @@ func (h *Handlers) СreditingFunds(w http.ResponseWriter, r *http.Request) {
 
 	idStr := r.URL.Query().Get("id")
 	valueStr := r.URL.Query().Get("value")
-
 	if idStr == "" || valueStr == "" {
 		err := errs.New(nil, errs.ErrBadRequest, false, 500)
 		h.CheckErrWriteResp(err, w, reqID)
